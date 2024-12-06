@@ -2,6 +2,8 @@ package com.gym.crm.service.impl;
 
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainingMapper;
+import com.gym.crm.model.dto.enums.ActionType;
+import com.gym.crm.model.dto.request.TrainerWorkload;
 import com.gym.crm.model.dto.request.TrainingRequest;
 import com.gym.crm.model.dto.response.TrainingResponse;
 import com.gym.crm.model.entity.Trainee;
@@ -13,6 +15,7 @@ import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
 import com.gym.crm.service.TrainingService;
+import com.gym.crm.service.client.WorkloadClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,8 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepository;
     private final TrainingMapper trainingMapper;
     private final TrainingTypeRepository trainingTypeRepository;
+    private final WorkloadClient workloadClient;
+
 
     @Override
     public void create(TrainingRequest trainingRequest) {
@@ -54,6 +59,52 @@ public class TrainingServiceImpl implements TrainingService {
         training.setTrainee(trainee);
         training.setTrainer(trainer);
         training.setTrainingType(trainingType);
+        trainingRepository.save(training);
+
+        trainee.addTrainer(trainer);
+        trainer.addTrainee(trainee);
+
+        traineeRepository.save(trainee);
+        trainerRepository.save(trainer);
+
+        log.info("Training created successfully with ID: {}", training.getId());
+    }
+
+    @Override
+    public void create(TrainingRequest trainingRequest, String authorization) {
+        Long traineeId = trainingRequest.traineeId();
+        Long trainerId = trainingRequest.trainerId();
+
+        log.info("trainee id: {}, trainer id : {}", traineeId, trainerId);
+
+        log.debug("Creating training with request: {}", trainingRequest);
+
+        Trainer trainer = trainerRepository.findByIdWithTrainees(trainerId)
+                .orElseThrow(() -> new CustomNotFoundException("Trainer not found with id: %d".formatted(trainerId)));
+
+        Trainee trainee = traineeRepository.findByIdWithTrainers(traineeId)
+                .orElseThrow(() -> new CustomNotFoundException("Trainee not found with id: %d".formatted(traineeId)));
+
+        TrainingType trainingType = trainingTypeRepository.findById(trainingRequest.trainingTypeId())
+                .orElseThrow(() -> new CustomNotFoundException("TrainingType with id : %d not found".formatted(trainingRequest.trainingTypeId())));
+
+        Training training = trainingMapper.toEntity(trainingRequest);
+
+        workloadClient.processWorkload(new TrainerWorkload(
+                        trainer.getUsername(),
+                        trainer.getFirstName(),
+                        trainer.getLastName(),
+                        trainer.getIsActive(),
+                        trainingRequest.trainingDate(),
+                        (double) trainingRequest.duration().toMinutes() / 60.0,
+                        ActionType.ADD
+                ), authorization
+        );
+
+        training.setTrainee(trainee);
+        training.setTrainer(trainer);
+        training.setTrainingType(trainingType);
+
         trainingRepository.save(training);
 
         trainee.addTrainer(trainer);

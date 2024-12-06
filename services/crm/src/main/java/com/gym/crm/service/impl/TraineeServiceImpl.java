@@ -3,6 +3,7 @@ package com.gym.crm.service.impl;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TraineeMapper;
 import com.gym.crm.mapper.TrainerMapper;
+import com.gym.crm.model.dto.request.RegisterRequest;
 import com.gym.crm.model.dto.request.TraineeRequest;
 import com.gym.crm.model.dto.response.RegistrationResponse;
 import com.gym.crm.model.dto.response.TraineeResponse;
@@ -13,6 +14,7 @@ import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
 import com.gym.crm.service.TraineeService;
+import com.gym.crm.service.client.AuthClient;
 import com.gym.crm.util.PasswordGenerator;
 import com.gym.crm.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
+    private final AuthClient authClient;
 
     @Override
     @Transactional
@@ -46,7 +49,9 @@ public class TraineeServiceImpl implements TraineeService {
             log.info("Username already exists, changed to {}", newTrainee.getUsername());
         }
 
+        authClient.register(new RegisterRequest(newTrainee.getUsername(), newTrainee.getPassword()));
         traineeRepository.save(newTrainee);
+
         log.info("Trainee saved : {}", newTrainee.getUsername());
         return new RegistrationResponse(newTrainee.getUsername(), newTrainee.getPassword());
     }
