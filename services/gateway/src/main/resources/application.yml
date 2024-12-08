@@ -1,5 +1,6 @@
 server:
-  port: 8222
+  port: ${SERVER_PORT:8222}
+
 
 spring:
   application:
@@ -9,7 +10,7 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: ${SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED:true}
 
       routes:
         - id: crm-auth
@@ -43,3 +44,8 @@ spring:
           uri: lb:http://AUTH-SERVICE
           predicates:
             - Path=/auth/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka/

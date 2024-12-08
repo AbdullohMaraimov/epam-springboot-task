@@ -3,6 +3,8 @@ package com.gym.crm.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.health.SimpleStatusAggregator;
+import org.springframework.boot.actuate.health.StatusAggregator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,5 +31,9 @@ public class AppConfig {
         return NoOpPasswordEncoder.getInstance();
     }
 
+    @Bean
+    public StatusAggregator statusAggregator() {
+        return new SimpleStatusAggregator();
+    }
 
 }

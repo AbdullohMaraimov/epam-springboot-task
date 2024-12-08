@@ -36,7 +36,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public RegistrationResponse create(TrainerRequest trainerRequest) {
-        log.debug("Creating new trainer with request: {}", trainerRequest);
+        log.info("Creating new trainer with request: {}", trainerRequest);
         Trainer trainer = trainerMapper.toTrainer(trainerRequest);
         trainer.setPassword(PasswordGenerator.generatePassword());
         TrainingType trainingType = trainingTypeRepository.findById(trainerRequest.specializationId())

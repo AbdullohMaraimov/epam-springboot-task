@@ -1,48 +1,54 @@
-create table training_type (
-                               id bigint generated always as identity primary key,
-                               name varchar(50) not null unique
+
+CREATE TABLE training_type (
+                               id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                               name VARCHAR(50) NOT NULL UNIQUE
 );
 
-create table users (
-                       id bigint generated always as identity primary key,
-                       first_name varchar(50),
-                       last_name varchar(50),
-                       username varchar(50),
-                       password varchar(50),
-                       is_active boolean
+
+CREATE TABLE users (
+                       id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                       first_name VARCHAR(50),
+                       last_name VARCHAR(50),
+                       username VARCHAR(50),
+                       password VARCHAR(50),
+                       is_active BOOLEAN
 );
 
-create table trainee (
-                         id bigint primary key,
-                         date_of_birth date,
-                         address varchar(100),
-                         foreign key (id) references users(id) on delete cascade
+
+CREATE TABLE trainee (
+                         id BIGINT PRIMARY KEY,
+                         date_of_birth DATE,
+                         address VARCHAR(100),
+                         CONSTRAINT fk_users_trainee FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-create table trainer (
-                         id bigint primary key,
-                         specialization_id bigint,
-                         foreign key (id) references users(id) on delete cascade,
-                         foreign key (specialization_id) references training_type(id) on delete cascade
+
+CREATE TABLE trainer (
+                         id BIGINT PRIMARY KEY,
+                         specialization_id BIGINT,
+                         CONSTRAINT fk_users_trainer FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
+                         CONSTRAINT fk_training_type FOREIGN KEY (specialization_id) REFERENCES training_type(id) ON DELETE CASCADE
 );
 
-create table training (
-                          id bigint generated always as identity primary key,
-                          trainee_id bigint not null,
-                          trainer_id bigint not null,
-                          training_name varchar(50),
-                          training_type_id bigint,
-                          training_date date,
-                          duration decimal,
-                          foreign key (trainee_id) references trainee(id) on delete cascade,
-                          foreign key (trainer_id) references trainer(id) on delete cascade,
-                          foreign key (training_type_id) references training_type(id) on delete cascade
+
+CREATE TABLE training (
+                          id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                          trainee_id BIGINT NOT NULL,
+                          trainer_id BIGINT NOT NULL,
+                          training_name VARCHAR(50),
+                          training_type_id BIGINT,
+                          training_date DATE,
+                          duration DECIMAL,
+                          CONSTRAINT fk_trainee_training FOREIGN KEY (trainee_id) REFERENCES trainee(id) ON DELETE CASCADE,
+                          CONSTRAINT fk_trainer_training FOREIGN KEY (trainer_id) REFERENCES trainer(id) ON DELETE CASCADE,
+                          CONSTRAINT fk_training_type_training FOREIGN KEY (training_type_id) REFERENCES training_type(id) ON DELETE CASCADE
 );
 
-create table trainee_trainer (
-                                 trainee_id bigint not null,
-                                 trainer_id bigint not null,
-                                 primary key (trainee_id, trainer_id),
-                                 foreign key (trainee_id) references trainee(id) on delete cascade,
-                                 foreign key (trainer_id) references trainer(id) on delete cascade
+
+CREATE TABLE trainee_trainer (
+                                 trainee_id BIGINT NOT NULL,
+                                 trainer_id BIGINT NOT NULL,
+                                 PRIMARY KEY (trainee_id, trainer_id),
+                                 CONSTRAINT fk_trainee FOREIGN KEY (trainee_id) REFERENCES trainee(id) ON DELETE CASCADE,
+                                 CONSTRAINT fk_trainer FOREIGN KEY (trainer_id) REFERENCES trainer(id) ON DELETE CASCADE
 );

@@ -98,6 +98,7 @@ public class DataInitializer {
         Resource resource = new ClassPathResource(traineeDataFile);
 
         try (CSVReader reader = new CSVReader(new InputStreamReader(resource.getInputStream()))) {
+            log.info("INsize try trainee data from file...");
             List<String[]> rows = reader.readAll();
             for (String[] parts : rows) {
                 if (parts.length >= 5) {
