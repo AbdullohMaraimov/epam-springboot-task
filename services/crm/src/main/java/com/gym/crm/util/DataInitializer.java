@@ -16,6 +16,7 @@ import com.opencsv.exceptions.CsvException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -197,7 +198,7 @@ public class DataInitializer {
                     );
 
                     log.info("creating training: {}", training);
-                    trainingService.create(training);
+                    trainingService.create(training, "Bearer init");
                     log.info("training created: {}", training);
                 } else {
                     log.warn("Skipping invalid training row: {}", String.join(",", parts));

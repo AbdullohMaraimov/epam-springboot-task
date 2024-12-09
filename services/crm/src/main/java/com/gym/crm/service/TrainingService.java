@@ -12,8 +12,6 @@ public interface TrainingService {
 
     void create(TrainingRequest trainingRequest, String authorization);
 
-    void create(TrainingRequest trainingRequest);
-
     TrainingResponse findById(Long id);
 
     List<TrainingResponse> findAll();

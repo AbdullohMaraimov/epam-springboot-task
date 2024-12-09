@@ -62,9 +62,10 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     depends_on:
-      - postgres
-      - discovery-service
       - auth-service
+      - workload-service
+      - discovery-service
+
     ports:
       - "8090:8090"
     networks:

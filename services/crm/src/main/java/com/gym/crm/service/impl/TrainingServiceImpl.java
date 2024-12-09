@@ -35,41 +35,6 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainingTypeRepository trainingTypeRepository;
     private final WorkloadClient workloadClient;
 
-
-    @Override
-    public void create(TrainingRequest trainingRequest) {
-        Long traineeId = trainingRequest.traineeId();
-        Long trainerId = trainingRequest.trainerId();
-
-        log.info("trainee id: {}, trainer id : {}", traineeId, trainerId);
-
-        log.debug("Creating training with request: {}", trainingRequest);
-
-        Trainer trainer = trainerRepository.findByIdWithTrainees(trainerId)
-                .orElseThrow(() -> new CustomNotFoundException("Trainer not found with id: %d".formatted(trainerId)));
-
-        Trainee trainee = traineeRepository.findByIdWithTrainers(traineeId)
-                .orElseThrow(() -> new CustomNotFoundException("Trainee not found with id: %d".formatted(traineeId)));
-
-        TrainingType trainingType = trainingTypeRepository.findById(trainingRequest.trainingTypeId())
-                .orElseThrow(() -> new CustomNotFoundException("TrainingType with id : %d not found".formatted(trainingRequest.trainingTypeId())));
-
-        Training training = trainingMapper.toEntity(trainingRequest);
-
-        training.setTrainee(trainee);
-        training.setTrainer(trainer);
-        training.setTrainingType(trainingType);
-        trainingRepository.save(training);
-
-        trainee.addTrainer(trainer);
-        trainer.addTrainee(trainee);
-
-        traineeRepository.save(trainee);
-        trainerRepository.save(trainer);
-
-        log.info("Training created successfully with ID: {}", training.getId());
-    }
-
     @Override
     public void create(TrainingRequest trainingRequest, String authorization) {
         Long traineeId = trainingRequest.traineeId();

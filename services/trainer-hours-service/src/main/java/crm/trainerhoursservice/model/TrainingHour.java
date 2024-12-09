@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
+@Table(name = "training_hour")
 public class TrainingHour {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
