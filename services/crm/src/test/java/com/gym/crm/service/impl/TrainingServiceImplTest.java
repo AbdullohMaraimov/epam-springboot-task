@@ -71,7 +71,7 @@ class TrainingServiceImplTest {
         when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
         when(trainingMapper.toEntity(trainingRequest)).thenReturn(training);
 
-        trainingService.create(trainingRequest);
+        trainingService.create(trainingRequest, "Bearer init");
 
         verify(trainerRepository, times(1)).findByIdWithTrainees(1L);
         verify(traineeRepository, times(1)).findByIdWithTrainers(1L);
@@ -92,7 +92,7 @@ class TrainingServiceImplTest {
         when(trainerRepository.findByIdWithTrainees(trainerId)).thenReturn(Optional.empty());
 
         CustomNotFoundException e = assertThrows(CustomNotFoundException.class,
-                () -> trainingService.create(trainingRequest));
+                () -> trainingService.create(trainingRequest, anyString()));
 
         assertEquals(e.getMessage(), "Trainer not found with id: %d".formatted(trainerId));
 

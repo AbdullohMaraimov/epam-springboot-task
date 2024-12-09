@@ -6,6 +6,7 @@ import com.gym.crm.model.dto.response.ApiResponse;
 import com.gym.crm.model.dto.response.TrainingResponse;
 import com.gym.crm.model.entity.TrainingType;
 import com.gym.crm.service.TrainingService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,20 @@ import java.util.List;
 public class TrainingController implements TrainingControllerDocumentation {
 
     private final TrainingService trainingService;
+    private final String TRAINING_SERVICE = "trainingService";
 
     @PostMapping
-    public ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request) {
+    @CircuitBreaker(name = TRAINING_SERVICE, fallbackMethod = "createTrainingFallback")
+    public ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request, @RequestHeader("Authorization") String authorization) {
         log.info("Creating training: {}", request);
-        trainingService.create(request);
+        trainingService.create(request, authorization);
         log.info("Created training: {}", request);
         return new ApiResponse<>(200,true, null, "Training created successfully!");
+    }
+
+    public ApiResponse<Void> createTrainingFallback(TrainingRequest request, String authorization, Throwable throwable) {
+        log.error("Fallback triggered due to: {}", throwable.getMessage());
+        return new ApiResponse<>(500,true, null, "Training service is temporarily unavailable. Please try again later!");
     }
 
     @GetMapping("{id}")

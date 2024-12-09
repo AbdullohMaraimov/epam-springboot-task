@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TrainingService {
 
-    void create(TrainingRequest trainingRequest);
+    void create(TrainingRequest trainingRequest, String authorization);
 
     TrainingResponse findById(Long id);
 

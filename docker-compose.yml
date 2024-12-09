@@ -1,0 +1,110 @@
+services:
+
+  discovery-service:
+    build: ./services/discovery
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+
+  gateway:
+    build:
+      context: ./services/gateway
+    environment:
+      - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
+    ports:
+      - "8222:8222"
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-net
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    environment:
+      - DATABASE_URL=jdbc:h2:mem:auth_db
+      - DB_USERNAME=sa
+      - DB_PASSWORD=password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-net
+
+
+  workload-service:
+    build:
+      context: ./services/trainer-hours-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:workload
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_H2_CONSOLE_ENABLED=true
+    ports:
+      - "8060:8060"
+    depends_on:
+      - discovery-service
+    networks:
+      - microservices-net
+
+
+  crm-service:
+    build:
+      context: ./services/crm
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/crm_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - auth-service
+      - workload-service
+      - discovery-service
+
+    ports:
+      - "8090:8090"
+    networks:
+      - microservices-net
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: crm_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pgadmin:
