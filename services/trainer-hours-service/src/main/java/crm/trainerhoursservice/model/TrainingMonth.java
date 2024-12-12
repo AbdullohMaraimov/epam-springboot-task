@@ -18,7 +18,7 @@ public class TrainingMonth {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "training_month", columnDefinition = "VARCHAR(20)")
+    @Column(name = "training_month")
     private Month month;
 
     private Double durationInHour;

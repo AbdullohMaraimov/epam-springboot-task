@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainingMapper;
 import com.gym.crm.model.dto.enums.ActionType;
@@ -14,8 +15,8 @@ import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
+import com.gym.crm.service.mq.MessageProducer;
 import com.gym.crm.service.TrainingService;
-import com.gym.crm.service.client.WorkloadClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,10 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepository;
     private final TrainingMapper trainingMapper;
     private final TrainingTypeRepository trainingTypeRepository;
-    private final WorkloadClient workloadClient;
+    private final MessageProducer messageProducer;
 
     @Override
-    public void create(TrainingRequest trainingRequest, String authorization) {
+    public void create(TrainingRequest trainingRequest, String authorization) throws JsonProcessingException {
         Long traineeId = trainingRequest.traineeId();
         Long trainerId = trainingRequest.trainerId();
 
@@ -55,16 +56,14 @@ public class TrainingServiceImpl implements TrainingService {
 
         Training training = trainingMapper.toEntity(trainingRequest);
 
-        workloadClient.processWorkload(new TrainerWorkload(
+        messageProducer.sendMessage(new TrainerWorkload(
                         trainer.getUsername(),
                         trainer.getFirstName(),
                         trainer.getLastName(),
                         trainer.getIsActive(),
                         trainingRequest.trainingDate(),
                         (double) trainingRequest.duration().toMinutes() / 60.0,
-                        ActionType.ADD
-                ), authorization
-        );
+                        ActionType.ADD));
 
         training.setTrainee(trainee);
         training.setTrainer(trainer);

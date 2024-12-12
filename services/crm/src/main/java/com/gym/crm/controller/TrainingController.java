@@ -1,5 +1,6 @@
 package com.gym.crm.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.controller.documentation.TrainingControllerDocumentation;
 import com.gym.crm.model.dto.request.TrainingRequest;
 import com.gym.crm.model.dto.response.ApiResponse;
@@ -25,7 +26,7 @@ public class TrainingController implements TrainingControllerDocumentation {
 
     @PostMapping
     @CircuitBreaker(name = TRAINING_SERVICE, fallbackMethod = "createTrainingFallback")
-    public ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request, @RequestHeader("Authorization") String authorization) {
+    public ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request, @RequestHeader("Authorization") String authorization) throws JsonProcessingException {
         log.info("Creating training: {}", request);
         trainingService.create(request, authorization);
         log.info("Created training: {}", request);

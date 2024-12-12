@@ -1,5 +1,6 @@
 package com.gym.crm.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.model.dto.request.TrainerRequest;
 import com.gym.crm.model.dto.response.RegistrationResponse;
 import com.gym.crm.model.dto.response.TrainerResponse;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface TrainerService {
 
-    RegistrationResponse create(TrainerRequest trainer);
+    RegistrationResponse create(TrainerRequest trainer) throws JsonProcessingException;
 
     TrainerResponse update(String username, TrainerRequest trainer);
 

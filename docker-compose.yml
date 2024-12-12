@@ -10,10 +10,16 @@ services:
       - microservices-net
 
   gateway:
+    container_name: gateway
     build:
       context: ./services/gateway
     environment:
       - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
+      - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
+      - CRM_URI=http://CRM
+      - WORKLOAD_URI=http://TRAINER-HOURS-SERVICE
+      - AUTH_URI=http://AUTH-SERVICE
+      - HOSTNAME=gateway
     ports:
       - "8222:8222"
     depends_on:
@@ -22,21 +28,27 @@ services:
       - microservices-net
 
   auth-service:
+    container_name: auth-service
     build:
       context: ./services/auth-service
     environment:
       - DATABASE_URL=jdbc:h2:mem:auth_db
       - DB_USERNAME=sa
       - DB_PASSWORD=password
+      - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
+      - ACTIVE_MQ=tcp://activemq:61616
+      - HOSTNAME=auth-service
     ports:
       - "8080:8080"
     depends_on:
       - discovery-service
+      - activemq
     networks:
       - microservices-net
 
 
   workload-service:
+    container_name: workload-service
     build:
       context: ./services/trainer-hours-service
     environment:
@@ -45,6 +57,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_H2_CONSOLE_ENABLED=true
+      - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
+      - ACTIVE_MQ=tcp://activemq:61616
+      - HOSTNAME=workload-service
     ports:
       - "8060:8060"
     depends_on:
@@ -54,6 +69,7 @@ services:
 
 
   crm-service:
+    container_name: crm-service
     build:
       context: ./services/crm
     environment:
@@ -61,6 +77,9 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
+      - ACTIVE_MQ=tcp://activemq:61616
+      - HOSTNAME=crm-service
     depends_on:
       - auth-service
       - workload-service
@@ -101,6 +120,20 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  activemq:
+    image: apache/activemq-artemis:latest
+    container_name: activemq
+    environment:
+      - ARTEMIS_USER=admin
+      - ARTEMIS_PASSWORD=admin
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    volumes:
+      - activemq-data:/var/lib/artemis-instance
+    networks:
+      - microservices-net
+
 networks:
   microservices-net:
     driver: bridge
@@ -108,3 +141,4 @@ networks:
 volumes:
   postgres-data:
   pgadmin:
+  activemq-data:

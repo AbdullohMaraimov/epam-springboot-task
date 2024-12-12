@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TraineeMapper;
 import com.gym.crm.mapper.TrainerMapper;
@@ -13,8 +14,8 @@ import com.gym.crm.model.entity.Trainer;
 import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
+import com.gym.crm.service.mq.MessageProducer;
 import com.gym.crm.service.TraineeService;
-import com.gym.crm.service.client.AuthClient;
 import com.gym.crm.util.PasswordGenerator;
 import com.gym.crm.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +36,11 @@ public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
     private final TrainingRepository trainingRepository;
-    private final AuthClient authClient;
+    private final MessageProducer messageProducer;
 
     @Override
     @Transactional
-    public RegistrationResponse create(TraineeRequest trainee) {
+    public RegistrationResponse create(TraineeRequest trainee) throws JsonProcessingException {
         log.info("Creating new trainee with request: {}", trainee);
         Trainee newTrainee = traineeMapper.toTrainee(trainee);
         newTrainee.setPassword(PasswordGenerator.generatePassword());
@@ -49,7 +50,8 @@ public class TraineeServiceImpl implements TraineeService {
             log.info("Username already exists, changed to {}", newTrainee.getUsername());
         }
 
-        authClient.register(new RegisterRequest(newTrainee.getUsername(), newTrainee.getPassword()));
+        messageProducer.sendMessage(new RegisterRequest(newTrainee.getUsername(), newTrainee.getPassword()));
+
         traineeRepository.save(newTrainee);
 
         log.info("Trainee saved : {}", newTrainee.getUsername());

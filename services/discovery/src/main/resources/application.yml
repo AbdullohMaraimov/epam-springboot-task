@@ -2,6 +2,7 @@
     application:
       name: discovery-service
 
+  # Eureka server config
   eureka:
     server:
       enable-self-preservation: false
@@ -12,10 +13,11 @@
       register-with-eureka: false
       fetch-registry: false
 
-
+  # Server config
   server:
     port: 8761
 
+  # Actuator config
   management:
     endpoints:
       web:

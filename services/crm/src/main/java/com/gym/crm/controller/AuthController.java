@@ -82,6 +82,7 @@ public class AuthController implements AuthControllerDocumentation {
         }
 
         log.error("Fallback triggered due to: {}", throwable.getMessage());
+        log.error(throwable.getMessage());
         return new ApiResponse<>(500,true, null, "Auth service is temporarily unavailable. Please try again later!");
     }
 

@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainingMapper;
 import com.gym.crm.model.dto.request.TrainingRequest;
@@ -52,7 +53,7 @@ class TrainingServiceImplTest {
 
 
     @Test
-    void createTrainingSuccessfully() {
+    void createTrainingSuccessfully() throws JsonProcessingException {
         TrainingRequest trainingRequest = new TrainingRequest(1L, 1L, "", 1L, LocalDate.now(), Duration.ofDays(1L));
         Trainer trainer = new Trainer();
         trainer.setTrainees(new ArrayList<>());
