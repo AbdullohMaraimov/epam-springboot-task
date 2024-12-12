@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DQLConsumer {
 
-    @JmsListener(destination = "workload.dead.letter.queue")
+    @JmsListener(destination = "${workload_dlq}")
     public void deadLetterConsume(String payload) {
         log.warn("Invalid message: {}", payload);
     }

@@ -46,5 +46,4 @@ public class AppConfig {
     public AuthenticationManager authenticationManager() {
         return new ProviderManager(authenticationProvider());
     }
-
 }

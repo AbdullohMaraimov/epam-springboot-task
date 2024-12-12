@@ -20,11 +20,11 @@ import java.io.IOException;
 public class MessageConsumer {
 
     private final AuthService authService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final JmsTemplate jmsTemplate;
-    private final Queue deadLetterQueue = new ActiveMQQueue("auth.dead.letter.queue");
+    private final Queue deadLetterQueue;
 
-    @JmsListener(destination = "auth.queue")
+    @JmsListener(destination = "${auth_queue}")
     public void receiveMessage(String payload) {
         objectMapper.registerModule(new JavaTimeModule());
         try {
@@ -35,5 +35,4 @@ public class MessageConsumer {
             jmsTemplate.convertAndSend(deadLetterQueue, payload);
         }
     }
-
 }

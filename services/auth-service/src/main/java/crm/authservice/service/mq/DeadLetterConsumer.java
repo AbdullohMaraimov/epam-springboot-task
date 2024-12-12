@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DeadLetterConsumer {
 
-    @JmsListener(destination = "auth.dead.letter.queue")
+    @JmsListener(destination = "${auth_dlq}")
     public void consumeDeadLetter(String payload) {
         log.warn("Invalid request: {}", payload);
     }
