@@ -1,24 +1,27 @@
+#Server config
 server:
-  port: 8222
+  port: ${SERVER_PORT:8222}
 
+# Spring config
 spring:
   application:
     name: gateway
 
+# Gateway routes config
   cloud:
     gateway:
       discovery:
         locator:
-          enabled: true
+          enabled: ${SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED:true}
 
       routes:
         - id: crm-auth
-          uri: lb:http://CRM
+          uri: lb://CRM
           predicates:
             - Path=/api/v1/auth/**
 
         - id: crm-trainee
-          uri: lb:http://CRM
+          uri: lb://CRM
           predicates:
             - Path=/api/v1/trainee/**
             - Path=/api/v1/trainer/**
@@ -26,20 +29,28 @@ spring:
             - AuthenticationFilter
 
         - id: crm-training
-          uri: lb:http://CRM
+          uri: lb://CRM
           predicates:
             - Path=/api/v1/training/**
           filters:
             - AuthenticationFilter
 
         - id: trainer-hours-service
-          uri: lb:http://TRAINER-HOURS-SERVICE
+          uri: lb://TRAINER-HOURS-SERVICE
           predicates:
             - Path=/api/v1/workload/**
           filters:
             - AuthenticationFilter
 
         - id: auth-service
-          uri: lb:http://AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
+
+#Eureka client config
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}
+  instance:
+    hostname: ${HOSTNAME:localhost}

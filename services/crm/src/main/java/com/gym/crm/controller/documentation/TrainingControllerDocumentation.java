@@ -1,5 +1,6 @@
 package com.gym.crm.controller.documentation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.model.dto.request.TrainingRequest;
 import com.gym.crm.model.dto.response.ApiResponse;
 import com.gym.crm.model.dto.response.TrainingResponse;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -23,7 +25,7 @@ public interface TrainingControllerDocumentation {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Bad request due to invalid input"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Trainer or Trainee not found")
     })
-    ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request);
+    ApiResponse<Void> create(@Valid @RequestBody TrainingRequest request, @RequestHeader("Authorization") String authorization) throws JsonProcessingException;
 
 
     @Operation(summary = "Find a training by ID",

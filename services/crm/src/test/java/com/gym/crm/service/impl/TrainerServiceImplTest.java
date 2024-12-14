@@ -1,7 +1,9 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainerMapper;
+import com.gym.crm.model.dto.request.RegisterRequest;
 import com.gym.crm.model.dto.request.TrainerRequest;
 import com.gym.crm.model.dto.response.RegistrationResponse;
 import com.gym.crm.model.dto.response.TrainerResponse;
@@ -9,6 +11,7 @@ import com.gym.crm.model.entity.Trainer;
 import com.gym.crm.model.entity.TrainingType;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
+import com.gym.crm.service.client.AuthClient;
 import com.gym.crm.util.PasswordGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +30,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TrainerServiceImplTest {
+
+    @Mock
+    private AuthClient authClient;
 
     @Mock
     private TrainerMapper trainerMapper;
@@ -40,7 +47,7 @@ class TrainerServiceImplTest {
     private TrainerServiceImpl trainerService;
 
     @Test
-    void testUsernameExists_AddedSuffix() {
+    void testUsernameExists_AddedSuffix() throws JsonProcessingException {
         TrainerRequest trainerRequest = new TrainerRequest("ali", "vali", 1L, true);
         Trainer trainer = new Trainer();
         trainer.setUsername("ali.vali");
@@ -57,6 +64,7 @@ class TrainerServiceImplTest {
             when(trainerMapper.toTrainer(trainerRequest)).thenReturn(trainer);
             when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
             when(trainerRepository.existsTrainerByUsername("ali.vali")).thenReturn(true);
+            when(authClient.register(new RegisterRequest("ali.vali1", "pswd"))).thenReturn(ResponseEntity.ok(null));
 
             trainerService.create(trainerRequest);
 
@@ -70,7 +78,7 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    void testUsername_Success() {
+    void testUsername_Success() throws JsonProcessingException {
         TrainerRequest trainerRequest = new TrainerRequest("ali", "vali", 1L, true);
         Trainer trainer = new Trainer();
         trainer.setUsername("ali.vali");

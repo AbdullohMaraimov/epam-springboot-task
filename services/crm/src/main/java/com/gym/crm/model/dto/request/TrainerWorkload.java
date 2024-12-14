@@ -2,6 +2,7 @@ package com.gym.crm.model.dto.request;
 
 import com.gym.crm.model.dto.enums.ActionType;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public record TrainerWorkload(
@@ -12,4 +13,4 @@ public record TrainerWorkload(
         LocalDate trainingDate,
         double trainingDuration,
         ActionType actionType
-){}
+) implements Serializable {}

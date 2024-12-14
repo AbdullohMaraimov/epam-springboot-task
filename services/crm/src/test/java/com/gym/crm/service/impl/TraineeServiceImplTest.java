@@ -1,8 +1,9 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TraineeMapper;
-import com.gym.crm.mapper.TrainerMapper;
+import com.gym.crm.model.dto.request.RegisterRequest;
 import com.gym.crm.model.dto.request.TraineeRequest;
 import com.gym.crm.model.dto.response.RegistrationResponse;
 import com.gym.crm.model.dto.response.TraineeResponse;
@@ -11,10 +12,13 @@ import com.gym.crm.model.entity.Trainer;
 import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
+import com.gym.crm.service.client.AuthClient;
+import com.gym.crm.util.PasswordGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -31,6 +35,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class TraineeServiceImplTest {
 
     @Mock
+    private AuthClient authClient;
+    @Mock
     private TraineeMapper traineeMapper;
     @Mock
     private TraineeRepository traineeRepository;
@@ -44,47 +50,63 @@ class TraineeServiceImplTest {
 
     @Test
     void create_Success() {
-        TraineeRequest traineeRequest = new TraineeRequest(
-                "Jim", "Rohn", LocalDate.of(2000, 1, 1), "USA", true
-        );
-        Trainee trainee = Trainee.builder()
-                .firstName(traineeRequest.firstName())
-                .lastName(traineeRequest.lastName())
-                .dateOfBirth(traineeRequest.dateOfBirth())
-                .address(traineeRequest.address())
-                .isActive(traineeRequest.isActive())
-                .username("Jim.Rohn")
-                .build();
+        try (MockedStatic<PasswordGenerator> generatorMockedStatic = mockStatic(PasswordGenerator.class)) {
+            String pswd = "pswd";
+            generatorMockedStatic.when(PasswordGenerator::generatePassword).thenReturn(pswd);
 
-        when(traineeMapper.toTrainee(traineeRequest)).thenReturn(trainee);
-        when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(false);
+            TraineeRequest traineeRequest = new TraineeRequest(
+                    "Jim", "Rohn", LocalDate.of(2000, 1, 1), "USA", true
+            );
+            Trainee trainee = Trainee.builder()
+                    .firstName(traineeRequest.firstName())
+                    .lastName(traineeRequest.lastName())
+                    .dateOfBirth(traineeRequest.dateOfBirth())
+                    .address(traineeRequest.address())
+                    .isActive(traineeRequest.isActive())
+                    .username("Jim.Rohn")
+                    .build();
 
-        RegistrationResponse registrationResponse = traineeService.create(traineeRequest);
+            when(traineeMapper.toTrainee(traineeRequest)).thenReturn(trainee);
+            when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(false);
+            when(authClient.register(new RegisterRequest("Jim.Rohn", "pswd"))).thenReturn(null);
 
-        assertEquals(trainee.getUsername(), registrationResponse.username());
+            RegistrationResponse registrationResponse = traineeService.create(traineeRequest);
 
-        verify(traineeMapper, times(1)).toTrainee(traineeRequest);
-        verify(traineeRepository, times(1)).existsTraineeByUsername(any());
-        verify(traineeRepository, times(1)).save(trainee);
-        verifyNoMoreInteractions(traineeMapper, traineeRepository);
+            assertEquals(trainee.getUsername(), registrationResponse.username());
+
+            verify(traineeMapper, times(1)).toTrainee(traineeRequest);
+            verify(traineeRepository, times(1)).existsTraineeByUsername(any());
+            verify(traineeRepository, times(1)).save(trainee);
+            verifyNoMoreInteractions(traineeMapper, traineeRepository);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    void testCreate_WhenUsernameExists_ShouldChangeUsername() {
-        TraineeRequest request = new TraineeRequest("Jim", "Rohn", LocalDate.now(), "USA", true);
-        Trainee trainee = new Trainee("Jim", "Rohn", true, LocalDate.now(), "USA");
-        trainee.setUsername("Jim.Rohn1");
+    void testCreate_WhenUsernameExists_ShouldChangeUsername() throws JsonProcessingException {
 
-        when(traineeMapper.toTrainee(request)).thenReturn(trainee);
-        when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(true);
+        try (MockedStatic<PasswordGenerator> passwordGeneratorMockedStatic = mockStatic(PasswordGenerator.class)) {
+            String pswd = "pswd";
+            passwordGeneratorMockedStatic.when(PasswordGenerator::generatePassword).thenReturn(pswd);
 
-        RegistrationResponse response = traineeService.create(request);
-        assertEquals(response.username(), trainee.getUsername());
+            TraineeRequest request = new TraineeRequest("Jim", "Rohn", LocalDate.now(), "USA", true);
+            Trainee trainee = new Trainee("Jim", "Rohn", true, LocalDate.now(), "USA");
+            trainee.setUsername("Jim.Rohn");
 
-        verify(traineeMapper, times(1)).toTrainee(request);
-        verify(traineeRepository, times(1)).existsTraineeByUsername(anyString());
-        verify(traineeRepository, times(1)).save(trainee);
-        verifyNoMoreInteractions(traineeMapper, traineeRepository);
+            when(traineeMapper.toTrainee(request)).thenReturn(trainee);
+            when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(true);
+            when(authClient.register(new RegisterRequest("Jim.Rohn1", pswd))).thenReturn(null);
+
+            RegistrationResponse response = traineeService.create(request);
+            assertEquals(response.username(), trainee.getUsername());
+
+            verify(traineeMapper, times(1)).toTrainee(request);
+            verify(traineeRepository, times(1)).existsTraineeByUsername(anyString());
+            verify(traineeRepository, times(1)).save(trainee);
+            verifyNoMoreInteractions(traineeMapper, traineeRepository);
+
+        }
     }
 
     @Test

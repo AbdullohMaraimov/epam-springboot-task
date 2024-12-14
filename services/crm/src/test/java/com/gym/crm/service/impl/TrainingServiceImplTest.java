@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainingMapper;
 import com.gym.crm.model.dto.request.TrainingRequest;
@@ -52,7 +53,7 @@ class TrainingServiceImplTest {
 
 
     @Test
-    void createTrainingSuccessfully() {
+    void createTrainingSuccessfully() throws JsonProcessingException {
         TrainingRequest trainingRequest = new TrainingRequest(1L, 1L, "", 1L, LocalDate.now(), Duration.ofDays(1L));
         Trainer trainer = new Trainer();
         trainer.setTrainees(new ArrayList<>());
@@ -71,7 +72,7 @@ class TrainingServiceImplTest {
         when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
         when(trainingMapper.toEntity(trainingRequest)).thenReturn(training);
 
-        trainingService.create(trainingRequest);
+        trainingService.create(trainingRequest, "Bearer init");
 
         verify(trainerRepository, times(1)).findByIdWithTrainees(1L);
         verify(traineeRepository, times(1)).findByIdWithTrainers(1L);
@@ -92,7 +93,7 @@ class TrainingServiceImplTest {
         when(trainerRepository.findByIdWithTrainees(trainerId)).thenReturn(Optional.empty());
 
         CustomNotFoundException e = assertThrows(CustomNotFoundException.class,
-                () -> trainingService.create(trainingRequest));
+                () -> trainingService.create(trainingRequest, anyString()));
 
         assertEquals(e.getMessage(), "Trainer not found with id: %d".formatted(trainerId));
 

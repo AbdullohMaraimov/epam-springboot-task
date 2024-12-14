@@ -8,12 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
-        name = "trainer-hours-service",
-        url = "http://localhost:8222/api/v1/workload"
+        name = "trainer-hours-service"
 )
 public interface WorkloadClient {
 
-    @PostMapping
+    @PostMapping("/api/v1/workload")
     ResponseEntity<?> processWorkload(@RequestBody TrainerWorkload workload, @RequestHeader("Authorization") String authorization);
 
 }

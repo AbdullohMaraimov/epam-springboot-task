@@ -14,6 +14,7 @@ public class WorkloadService {
     private final TrainingMonthRepository monthRepository;
     private final TrainingYearRepository yearRepository;
     private final TrainerHourRepository trainerHourRepository;
+    private final TrainingMonthRepository trainingMonthRepository;
 
     public void handleWorkload(TrainerWorkload workload) {
         TrainingHour trainingHour = trainerHourRepository.findByTrainerUsername(workload.username())
@@ -63,13 +64,13 @@ public class WorkloadService {
         trainingMonth.setDurationInHour(trainingMonth.getDurationInHour() + workload.trainingDuration());
         trainingYear.setTotalDuration(trainingYear.getTotalDuration() + workload.trainingDuration());
         yearRepository.save(trainingYear);
+        trainingMonthRepository.save(trainingMonth);
 
     }
 
 
     public TrainingHour summarize(String trainerUsername) {
-        TrainingHour trainingHour = trainerHourRepository.findByTrainerUsername(trainerUsername)
+        return trainerHourRepository.findByTrainerUsername(trainerUsername)
                 .orElse(null);
-        return trainingHour;
     }
 }
