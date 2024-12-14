@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainerMapper;
 import com.gym.crm.model.dto.request.RegisterRequest;
@@ -10,6 +11,7 @@ import com.gym.crm.model.entity.Trainer;
 import com.gym.crm.model.entity.TrainingType;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
+import com.gym.crm.service.mq.MessageProducer;
 import com.gym.crm.service.TrainerService;
 import com.gym.crm.service.client.AuthClient;
 import com.gym.crm.util.PasswordGenerator;
@@ -34,8 +36,10 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final AuthClient authClient;
 
+    private final MessageProducer messageProducer;
+
     @Override
-    public RegistrationResponse create(TrainerRequest trainerRequest) {
+    public RegistrationResponse create(TrainerRequest trainerRequest) throws JsonProcessingException {
         log.info("Creating new trainer with request: {}", trainerRequest);
         Trainer trainer = trainerMapper.toTrainer(trainerRequest);
         trainer.setPassword(PasswordGenerator.generatePassword());
@@ -49,7 +53,9 @@ public class TrainerServiceImpl implements TrainerService {
         }
         RegistrationResponse registrationResponse = new RegistrationResponse(trainer.getUsername(), trainer.getPassword());
 
-        authClient.register(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
+        // authClient.register(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
+        messageProducer.sendMessage(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
+
         trainerRepository.save(trainer);
 
         log.info("Trainer saved successfully: {}", trainer);

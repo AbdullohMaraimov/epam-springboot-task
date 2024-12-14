@@ -27,7 +27,7 @@ public class TrainingYear {
     @ManyToOne
     private TrainingHour trainingHour;
 
-    @OneToMany(mappedBy = "trainingYear", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "trainingYear", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TrainingMonth> months = new ArrayList<>();
 
 

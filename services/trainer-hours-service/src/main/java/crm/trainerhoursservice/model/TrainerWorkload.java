@@ -2,6 +2,7 @@ package crm.trainerhoursservice.model;
 
 import crm.trainerhoursservice.model.constant.ActionType;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public record TrainerWorkload(
@@ -12,4 +13,4 @@ public record TrainerWorkload(
         LocalDate trainingDate,
         double trainingDuration,
         ActionType actionType
-){}
+) implements Serializable {}

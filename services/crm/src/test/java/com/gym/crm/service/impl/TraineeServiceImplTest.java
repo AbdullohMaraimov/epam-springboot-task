@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TraineeMapper;
 import com.gym.crm.model.dto.request.RegisterRequest;
@@ -77,11 +78,13 @@ class TraineeServiceImplTest {
             verify(traineeRepository, times(1)).existsTraineeByUsername(any());
             verify(traineeRepository, times(1)).save(trainee);
             verifyNoMoreInteractions(traineeMapper, traineeRepository);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Test
-    void testCreate_WhenUsernameExists_ShouldChangeUsername() {
+    void testCreate_WhenUsernameExists_ShouldChangeUsername() throws JsonProcessingException {
 
         try (MockedStatic<PasswordGenerator> passwordGeneratorMockedStatic = mockStatic(PasswordGenerator.class)) {
             String pswd = "pswd";

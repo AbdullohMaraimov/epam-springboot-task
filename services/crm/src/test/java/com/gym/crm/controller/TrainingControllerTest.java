@@ -1,5 +1,6 @@
 package com.gym.crm.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.model.dto.request.TrainingRequest;
 import com.gym.crm.model.dto.response.ApiResponse;
 import com.gym.crm.model.dto.response.TrainingResponse;
@@ -32,7 +33,7 @@ class TrainingControllerTest {
     }
 
     @Test
-    void create() {
+    void create() throws JsonProcessingException {
         TrainingRequest request = new TrainingRequest(1L, 1L, "Bodybuilding", 1L, LocalDate.now(), Duration.ofHours(2));
         ApiResponse<Void> apiResponse = new ApiResponse<>(200, "Training created successfully!", true);
 

@@ -1,5 +1,6 @@
 package com.gym.crm.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainerMapper;
 import com.gym.crm.model.dto.request.RegisterRequest;
@@ -46,7 +47,7 @@ class TrainerServiceImplTest {
     private TrainerServiceImpl trainerService;
 
     @Test
-    void testUsernameExists_AddedSuffix() {
+    void testUsernameExists_AddedSuffix() throws JsonProcessingException {
         TrainerRequest trainerRequest = new TrainerRequest("ali", "vali", 1L, true);
         Trainer trainer = new Trainer();
         trainer.setUsername("ali.vali");
@@ -77,7 +78,7 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    void testUsername_Success() {
+    void testUsername_Success() throws JsonProcessingException {
         TrainerRequest trainerRequest = new TrainerRequest("ali", "vali", 1L, true);
         Trainer trainer = new Trainer();
         trainer.setUsername("ali.vali");
