@@ -2,14 +2,11 @@ package crm.trainerhoursservice.service.mq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import crm.trainerhoursservice.model.TrainerWorkload;
+import crm.trainerhoursservice.model.dto.TrainerWorkload;
 import crm.trainerhoursservice.service.WorkloadService;
 import jakarta.jms.Queue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -20,14 +17,13 @@ import org.springframework.stereotype.Service;
 public class MessageListener {
 
     private final WorkloadService workloadService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final JmsTemplate jmsTemplate;
     private final Queue deadLetterQueue;
 
     @JmsListener(destination = "${workload_queue}")
     public void receiveMessage(String payload) {
         log.info("Got the message: {}", payload);
-        objectMapper.registerModule(new JavaTimeModule());
         try {
             TrainerWorkload workload = objectMapper.readValue(payload, TrainerWorkload.class);
             workloadService.handleWorkload(workload);
