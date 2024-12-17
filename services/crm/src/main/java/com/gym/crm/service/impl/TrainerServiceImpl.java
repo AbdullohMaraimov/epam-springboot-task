@@ -51,12 +51,12 @@ public class TrainerServiceImpl implements TrainerService {
             trainer.setUsername(trainer.getUsername() +  Utils.trainerIdx++);
             log.info("Username already exists, changed it to {}", trainer.getUsername());
         }
-        RegistrationResponse registrationResponse = new RegistrationResponse(trainer.getUsername(), trainer.getPassword());
 
-        // authClient.register(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
         messageProducer.sendMessage(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
 
-        trainerRepository.save(trainer);
+        Long id = trainerRepository.save(trainer).getId();
+
+        RegistrationResponse registrationResponse = new RegistrationResponse(id, trainer.getUsername(), trainer.getPassword());
 
         log.info("Trainer saved successfully: {}", trainer);
         return registrationResponse;
