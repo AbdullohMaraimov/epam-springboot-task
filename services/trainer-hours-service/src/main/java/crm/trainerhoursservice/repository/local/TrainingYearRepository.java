@@ -1,6 +1,6 @@
-package crm.trainerhoursservice.repository;
+package crm.trainerhoursservice.repository.local;
 
-import crm.trainerhoursservice.model.TrainingYear;
+import crm.trainerhoursservice.model.entity.dev.TrainingYear;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

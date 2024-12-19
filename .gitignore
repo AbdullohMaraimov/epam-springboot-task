@@ -1,0 +1,9 @@
+# Ignore IntelliJ IDEA project files
+.idea/
+
+# Ignore build output directories
+out/
+target/
+
+# Ignore IDE-specific settings for Maven
+*.iml

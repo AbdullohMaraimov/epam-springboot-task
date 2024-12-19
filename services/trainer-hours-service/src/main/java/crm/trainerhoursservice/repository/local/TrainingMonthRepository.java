@@ -1,6 +1,6 @@
-package crm.trainerhoursservice.repository;
+package crm.trainerhoursservice.repository.local;
 
-import crm.trainerhoursservice.model.TrainingMonth;
+import crm.trainerhoursservice.model.entity.dev.TrainingMonth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,3 +13,4 @@ public interface TrainingMonthRepository extends JpaRepository<TrainingMonth, In
     Optional<TrainingMonth> findByMonth(Month month);
 
 }
+

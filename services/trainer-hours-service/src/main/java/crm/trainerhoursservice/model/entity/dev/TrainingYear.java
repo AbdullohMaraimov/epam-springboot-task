@@ -1,4 +1,4 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.dev;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

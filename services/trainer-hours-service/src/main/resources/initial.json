@@ -1,0 +1,42 @@
+[
+  {
+    "username": "user1",
+    "firstName": "FirstName1",
+    "lastName": "LastName1",
+    "status": true,
+    "years": [
+      {
+        "year": 2025,
+        "totalDuration": 100.0,
+        "months": [
+          { "month": "JANUARY", "totalDuration": 10.0 },
+          { "month": "FEBRUARY", "totalDuration": 20.0 }
+        ]
+      },
+      {
+        "year": 2026,
+        "totalDuration": 200.0,
+        "months": [
+          { "month": "JANUARY", "totalDuration": 15.0 },
+          { "month": "FEBRUARY", "totalDuration": 25.0 }
+        ]
+      }
+    ]
+  },
+  {
+    "username": "user2",
+    "firstName": "FirstName2",
+    "lastName": "LastName2",
+    "status": false,
+    "years": [
+      {
+        "year": 2025,
+        "totalDuration": 110.0,
+        "months": [
+          { "month": "JANUARY", "totalDuration": 12.0 },
+          { "month": "FEBRUARY", "totalDuration": 22.0 }
+        ]
+      }
+    ]
+  }
+]

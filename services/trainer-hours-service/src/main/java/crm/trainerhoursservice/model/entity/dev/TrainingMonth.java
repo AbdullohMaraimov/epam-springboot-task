@@ -1,4 +1,4 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.dev;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,6 +24,6 @@ public class TrainingMonth {
     private Double durationInHour;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private TrainingYear trainingYear;
 }

@@ -42,7 +42,7 @@ class AuthControllerTest {
     @Test
     void registerTrainee() throws IOException {
         TraineeRequest traineeRequest = new TraineeRequest("Iman", "Gadzhi", LocalDate.of(2000, 1, 1), "USA", true);
-        RegistrationResponse registrationResponse = new RegistrationResponse("Iman.Gadzhi", "qwerty");
+        RegistrationResponse registrationResponse = new RegistrationResponse(1L, "Iman.Gadzhi", "qwerty");
         when(traineeService.create(traineeRequest)).thenReturn(registrationResponse);
 
         ApiResponse<RegistrationResponse> response = authController.register(traineeRequest);
@@ -56,7 +56,7 @@ class AuthControllerTest {
     @Test
     void registerTrainer() throws IOException {
         TrainerRequest trainerRequest = new TrainerRequest("John", "Doe", 1L, true);
-        RegistrationResponse registrationResponse = new RegistrationResponse("John.Doe", "qwerty");
+        RegistrationResponse registrationResponse = new RegistrationResponse(1L, "John.Doe", "qwerty");
 
         when(trainerService.create(trainerRequest)).thenReturn(registrationResponse);
 

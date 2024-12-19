@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface WorkloadClient {
 
     @PostMapping("/api/v1/workload")
-    ResponseEntity<?> processWorkload(@RequestBody TrainerWorkload workload, @RequestHeader("Authorization") String authorization);
+    ResponseEntity<?> processWorkload(@RequestBody TrainerWorkload workload);
 
 }
