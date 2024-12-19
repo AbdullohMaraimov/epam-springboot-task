@@ -1,9 +1,6 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.prod;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.ArrayList;
@@ -13,6 +10,8 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class YearlySummary {
     @Indexed
     private Integer year;

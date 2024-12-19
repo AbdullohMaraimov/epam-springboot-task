@@ -1,7 +1,7 @@
 package crm.trainerhoursservice.controller;
 
 import crm.trainerhoursservice.model.dto.TrainerWorkload;
-import crm.trainerhoursservice.model.WorkloadSummary;
+import crm.trainerhoursservice.model.entity.prod.WorkloadSummary;
 import crm.trainerhoursservice.service.WorkloadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

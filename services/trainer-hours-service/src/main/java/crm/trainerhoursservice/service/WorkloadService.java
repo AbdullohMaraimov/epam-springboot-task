@@ -1,20 +1,25 @@
 package crm.trainerhoursservice.service;
 
-import crm.trainerhoursservice.model.*;
 import crm.trainerhoursservice.model.dto.TrainerWorkload;
-import crm.trainerhoursservice.repository.WorkloadSummaryRepository;
-import lombok.RequiredArgsConstructor;
+import crm.trainerhoursservice.model.entity.prod.MonthlySummary;
+import crm.trainerhoursservice.model.entity.prod.WorkloadSummary;
+import crm.trainerhoursservice.model.entity.prod.YearlySummary;
+
+import crm.trainerhoursservice.repository.WorkloadRepository;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class WorkloadService {
 
-    private final WorkloadSummaryRepository workloadRepository;
+    private final WorkloadRepository workloadRepository;
 
     public void handleWorkload(TrainerWorkload workload) {
         log.info("Handling workload for trainer: {}", workload.username());
@@ -28,6 +33,8 @@ public class WorkloadService {
                                 .years(new ArrayList<>())
                                 .build()
                 );
+
+        log.info("From repo -> service: {}", workloadSummary);
 
         YearlySummary yearlySummary = null;
         for (YearlySummary year : workloadSummary.getYears()) {
@@ -52,8 +59,8 @@ public class WorkloadService {
                     .build();
 
             yearlySummary.addMonth(month);
-
             workloadSummary.addTrainingYear(yearlySummary);
+
             log.info("New yearly summary and workload summary saved : {}", workload);
             workloadRepository.save(workloadSummary);
             log.info("New yearly summary and workload summary saved for trainer: {}", workload.username());
@@ -64,13 +71,13 @@ public class WorkloadService {
         for (MonthlySummary month : yearlySummary.getMonths()) {
             if (month.getMonth() == workload.trainingDate().getMonth()) {
                 monthlySummary = month;
-                log.debug("Found existing monthly summary for month: {}", month.getMonth());
+                log.info("Found existing monthly summary for month: {}", month.getMonth());
                 break;
             }
         }
 
         if (monthlySummary == null) {
-            log.debug("No monthly summary found for month: {}. Creating a new one.", workload.trainingDate().getMonth());
+            log.info("No monthly summary found for month: {}. Creating a new one.", workload.trainingDate().getMonth());
             MonthlySummary month = MonthlySummary.builder()
                     .month(workload.trainingDate().getMonth())
                     .totalDuration(workload.trainingDuration())

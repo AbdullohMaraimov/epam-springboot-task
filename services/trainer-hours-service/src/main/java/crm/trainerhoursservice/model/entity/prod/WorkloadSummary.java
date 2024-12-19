@@ -1,9 +1,6 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.prod;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,12 +13,16 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkloadSummary {
     @Id
     private String id;
     @Indexed
     private String username;
+    @Indexed
     private String firstName;
+    @Indexed
     private String lastName;
     private Boolean status;
     private List<YearlySummary> years = new ArrayList<>();

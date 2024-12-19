@@ -64,6 +64,10 @@ services:
       - MONGO_PASSWORD=admin
       - MONGO_HOST=mongo
       - MONGO_PORT=27017
+      - DATABASE_URL_H2=jdbc:h2:mem:workload_db
+      - DB_USERNAME_H2=sa
+      - DB_PASSWORD_H2=password
+      - ACTIVE_PROFILE=prod
     ports:
       - "8060:8060"
     depends_on:

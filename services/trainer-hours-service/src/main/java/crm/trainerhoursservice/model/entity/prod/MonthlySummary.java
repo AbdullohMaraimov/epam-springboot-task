@@ -1,9 +1,6 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.prod;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.Month;
@@ -12,6 +9,8 @@ import java.time.Month;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class MonthlySummary {
     @Indexed
     private Month month;
