@@ -60,6 +60,14 @@ services:
       - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
       - ACTIVE_MQ=tcp://activemq:61616
       - HOSTNAME=workload-service
+      - MONGO_USERNAME=admin
+      - MONGO_PASSWORD=admin
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - DATABASE_URL_H2=jdbc:h2:mem:workload_db
+      - DB_USERNAME_H2=sa
+      - DB_PASSWORD_H2=password
+      - ACTIVE_PROFILE=prod
     ports:
       - "8060:8060"
     depends_on:
@@ -134,6 +142,29 @@ services:
     networks:
       - microservices-net
 
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    networks:
+      - microservices-net
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_AUTH_USERNAME: admin
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: admin
+      ME_CONFIG_MONGODB_URL: mongodb://admin:admin@mongo:27017/
+
 networks:
   microservices-net:
     driver: bridge
@@ -142,3 +173,4 @@ volumes:
   postgres-data:
   pgadmin:
   activemq-data:
+  mongo-data:

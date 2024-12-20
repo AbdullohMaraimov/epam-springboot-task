@@ -1,4 +1,4 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.dto;
 
 import crm.trainerhoursservice.model.constant.ActionType;
 

@@ -52,10 +52,10 @@ public class TraineeServiceImpl implements TraineeService {
 
         messageProducer.sendMessage(new RegisterRequest(newTrainee.getUsername(), newTrainee.getPassword()));
 
-        traineeRepository.save(newTrainee);
+        Long id = traineeRepository.save(newTrainee).getId();
 
         log.info("Trainee saved : {}", newTrainee.getUsername());
-        return new RegistrationResponse(newTrainee.getUsername(), newTrainee.getPassword());
+        return new RegistrationResponse(id, newTrainee.getUsername(), newTrainee.getPassword());
     }
 
     @Override

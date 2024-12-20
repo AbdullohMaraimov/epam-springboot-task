@@ -1,4 +1,4 @@
-package crm.trainerhoursservice.model;
+package crm.trainerhoursservice.model.entity.dev;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +26,7 @@ public class TrainingHour {
 
     private boolean isActive = true;
 
-    @OneToMany(mappedBy = "trainingHour", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "trainingHour", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<TrainingYear> trainingYears = new ArrayList<>();
 
 
@@ -38,3 +38,4 @@ public class TrainingHour {
         year.setTrainingHour(this);
     }
 }
+
