@@ -6,8 +6,8 @@ Feature: Authentication Management
     And api should return username "iman.gadzhi"
 
   Scenario: Register again with existing user
-    Given user already exists with username "iman.gadzhi" and password "12345678"
-    When user registers with existing username "iman.gadzhi" with password "12345678"
+    Given user "iman.gadzhi" exists with password "12345678"
+    When user submits registration request with username "iman.gadzhi" and password "12345678"
     Then user should see registration failed
 
   Scenario: Login with existing user

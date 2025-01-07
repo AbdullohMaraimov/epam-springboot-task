@@ -32,3 +32,32 @@ Feature: Trainee operations
     Given Trainee with username "Ali.Vali"
     When send request to "/api/v1/trainee/Ali.Vali" to delete trainee
     Then request should return success message of 200
+
+  Scenario: Find trainer with username
+    Given Trainer with firstName "Jill", lastname "Roy"
+    When send request to "/api/v1/trainer/Jill.Roy"
+    Then request should return success message
+    Then Check firstName and lastname of trainer
+
+  Scenario: Update trainer password
+    Given Trainer with firstName "Jill", lastname "Roy"
+    When do update password of trainer with username "Jill.Roy" to "12345678" request to "/api/v1/trainer/update-password"
+    Then request should return success message
+
+  Scenario: Deactivate trainer by username
+    Given Trainer with firstName "Jill", lastname "Roy"
+    When send request to "/api/v1/trainer/de-activate" to deactivate trainer with param "Jill.Roy"
+    Then request should return success message
+    Then trainer should be deactivated with username "Jill.Roy"
+
+  Scenario: Activate trainer by username
+    Given Trainer with firstName "Jill", lastname "Roy"
+    When send request to "/api/v1/trainer/activate" to activate trainer with param "Jill.Roy"
+    Then request should return success message
+    Then trainer should be activated with username "Jill.Roy"
+
+  Scenario: Create training
+    Given Trainer with firstName "Jill", lastname "Roy"
+    Given Trainee with username "Ali.Vali"
+    When send request to "/api/v1/training" to create training with trainee "Ali.Vali", trainer "Jill.Roy"
+    Then request should return success message

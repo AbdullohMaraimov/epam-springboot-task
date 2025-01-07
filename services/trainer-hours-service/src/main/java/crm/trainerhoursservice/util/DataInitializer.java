@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import crm.trainerhoursservice.repository.prod.WorkloadSummaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;
 
 @Component
+@Profile("prod")
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 

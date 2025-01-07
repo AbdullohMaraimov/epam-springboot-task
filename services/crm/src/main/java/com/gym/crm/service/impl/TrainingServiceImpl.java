@@ -43,7 +43,7 @@ public class TrainingServiceImpl implements TrainingService {
 
         log.info("trainee id: {}, trainer id : {}", traineeId, trainerId);
 
-        log.debug("Creating training with request: {}", trainingRequest);
+        log.info("Creating training with request: {}", trainingRequest);
 
         Trainer trainer = trainerRepository.findByIdWithTrainees(trainerId)
                 .orElseThrow(() -> new CustomNotFoundException("Trainer not found with id: %d".formatted(trainerId)));

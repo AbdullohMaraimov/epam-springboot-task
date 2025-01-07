@@ -9,8 +9,9 @@ import java.io.IOException;
 
 public interface AuthService {
 
-    RegistrationResponse register(RegisterRequest registerDto) throws IOException;
+    ResponseEntity<RegistrationResponse> register(RegisterRequest registerDto) throws IOException;
 
     ResponseEntity<String> login(LoginRequest loginDto);
 
+    void deleteByUsername(String username);
 }

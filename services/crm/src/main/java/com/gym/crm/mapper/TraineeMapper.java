@@ -32,7 +32,10 @@ public class TraineeMapper {
     }
 
     public TraineeResponse toTraineeResponse(Trainee trainee) {
-        List<TrainerResponse> trainerResponses = trainerMapper.toTrainerResponses(trainee.getTrainers());
+        List<TrainerResponse> trainerResponses = null;
+        if (trainee.getTrainers() != null && !trainee.getTrainers().isEmpty()) {
+            trainerResponses = trainerMapper.toTrainerResponses(trainee.getTrainers());
+        }
         return new TraineeResponse(
                 trainee.getId(),
                 trainee.getFirstName(),

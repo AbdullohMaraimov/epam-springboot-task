@@ -11,10 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -24,12 +21,11 @@ import java.io.IOException;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtService jwtService;
-    private final CustomUserDetailsService customUserDetailsService;
+
 
     @PostMapping("/register")
     public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegisterRequest request) throws IOException {
-        return ResponseEntity.ok(authService.register(request));
+        return authService.register(request);
     }
 
     @PostMapping("/login")
@@ -37,12 +33,11 @@ public class AuthController {
         return authService.login(request);
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<Boolean> validateToken(@RequestBody TokenValidationRequest token) {
-        UserDetails userDetails = customUserDetailsService
-                .loadUserByUsername(jwtService.extractUsername(token.token()));
 
-        return ResponseEntity.ok(jwtService.isTokenValid(token.token(), userDetails));
+    @DeleteMapping("/delete/{username}")
+    public ResponseEntity<String> delete(@PathVariable String username) {
+        authService.deleteByUsername(username);
+        return ResponseEntity.ok("Trainee with username " + username + " deleted successfully");
     }
 
 }

@@ -25,7 +25,7 @@ public class Trainer extends User{
     @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
     private List<Training> trainings = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "trainers")
+    @ManyToMany(mappedBy = "trainers", fetch = FetchType.LAZY)
     private List<Trainee> trainees = new ArrayList<>();
 
     public void addTrainee(Trainee trainee) {

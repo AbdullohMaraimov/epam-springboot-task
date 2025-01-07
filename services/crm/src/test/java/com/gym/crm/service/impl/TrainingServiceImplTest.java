@@ -3,6 +3,8 @@ package com.gym.crm.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gym.crm.exception.CustomNotFoundException;
 import com.gym.crm.mapper.TrainingMapper;
+import com.gym.crm.model.dto.enums.ActionType;
+import com.gym.crm.model.dto.request.TrainerWorkload;
 import com.gym.crm.model.dto.request.TrainingRequest;
 import com.gym.crm.model.dto.response.TrainingResponse;
 import com.gym.crm.model.entity.Trainee;
@@ -13,6 +15,7 @@ import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
+import com.gym.crm.service.mq.MessageProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,15 +51,26 @@ class TrainingServiceImplTest {
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Mock
+    private MessageProducer messageProducer;
+
     @InjectMocks
     private TrainingServiceImpl trainingService;
 
 
     @Test
     void createTrainingSuccessfully() throws JsonProcessingException {
-        TrainingRequest trainingRequest = new TrainingRequest(1L, 1L, "", 1L, LocalDate.now(), Duration.ofDays(1L));
+        TrainingRequest trainingRequest = new TrainingRequest(
+                1L,
+                1L,
+                "GYM",
+                1L,
+                LocalDate.now(),
+                Duration.ofDays(1L));
+
         Trainer trainer = new Trainer();
         trainer.setTrainees(new ArrayList<>());
+        trainer.setIsActive(true);
         trainer.setId(1L);
 
         Trainee trainee = new Trainee();
@@ -64,6 +78,16 @@ class TrainingServiceImplTest {
         trainee.setId(1L);
 
         TrainingType trainingType = new TrainingType(1L, "GYM");
+
+        TrainerWorkload trainerWorkload = new TrainerWorkload(
+                trainer.getUsername(),
+                trainer.getFirstName(),
+                trainer.getLastName(),
+                trainer.getIsActive(),
+                trainingRequest.trainingDate(),
+                trainingRequest.duration().toMinutes() / 60.0,
+                ActionType.ADD
+        );
 
         Training training = new Training();
 
@@ -74,6 +98,7 @@ class TrainingServiceImplTest {
 
         trainingService.create(trainingRequest, "Bearer init");
 
+        verify(messageProducer, times(1)).sendMessage(trainerWorkload);
         verify(trainerRepository, times(1)).findByIdWithTrainees(1L);
         verify(traineeRepository, times(1)).findByIdWithTrainers(1L);
         verify(trainingMapper, times(1)).toEntity(trainingRequest);

@@ -1,4 +1,4 @@
-package crm.authservice.steps;
+package crm.authservice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,12 +10,7 @@ import crm.authservice.repository.UserRepository;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.spring.CucumberContextConfiguration;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -26,20 +21,14 @@ import java.io.UnsupportedEncodingException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@CucumberContextConfiguration
-@NoArgsConstructor @AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthSteps {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private UserRepository userRepository;
-
+    private final MockMvc mockMvc;
+    private final UserRepository userRepository;
     private MockHttpServletResponse response;
+    private final ObjectMapper objectMapper;
 
-// -------------------------------------------------------------------------------//
 
     @Given("user submits registration request with username {string} and password {string}")
     public void submitRegistrationRequest(String username, String password) {
@@ -48,12 +37,12 @@ public class AuthSteps {
         try {
             response = mockMvc.perform(post("/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(request)))
+                    .content(objectMapper.writeValueAsString(request)))
                     .andReturn()
                     .getResponse();
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -64,45 +53,15 @@ public class AuthSteps {
 
     @Then("api should return username {string}")
     public void apiReturnsUsername(String username) throws UnsupportedEncodingException, JsonProcessingException {
-        RegistrationResponse registrationResponse = new ObjectMapper().readValue(response.getContentAsString(), RegistrationResponse.class);
+        RegistrationResponse registrationResponse = objectMapper.readValue(response.getContentAsString(), RegistrationResponse.class);
         assertEquals(username, registrationResponse.username());
     }
 
-// --------------------------------------------------------------------------------------------------//
 
-//    @Given("user already exists with username {string} and password {string}")
-//    public void submitInvalidRegistrationRequest(String username, String password) {
-//        if (userRepository.findByUsername(username).isEmpty()) {
-//            AuthUser user = AuthUser.builder()
-//                    .username(username)
-//                    .password(password)
-//                    .build();
-//            userRepository.save(user);
-//        }
-//    }
-//
-//    @When("user registers with existing username {string} with password {string}")
-//    public void userExistsWithUsername(String username, String password) {
-//        RegisterRequest request = new RegisterRequest(username, password);
-//
-//        try {
-//            response = mockMvc.perform(post("/auth/register")
-//                            .contentType(MediaType.APPLICATION_JSON)
-//                            .content(new ObjectMapper().writeValueAsString(request)))
-//                    .andReturn()
-//                    .getResponse();
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    @Then("user should see registration failed")
-//    public void userExists_invalidRequest() {
-//        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-//    }
-
-// ----------------------------------------------------------------------------------------------------//
+    @Then("user should see registration failed")
+    public void registrationFails() {
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+    }
 
     @Given("user {string} exists with password {string}")
     public void userExists(String username, String password) {
@@ -121,7 +80,7 @@ public class AuthSteps {
         try {
             response = mockMvc.perform(post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsString(loginRequest)))
+                    .content(objectMapper.writeValueAsString(loginRequest)))
                     .andReturn()
                     .getResponse();
 
@@ -140,7 +99,6 @@ public class AuthSteps {
         }
     }
 
-// -----------------------------------------------------------------------------------------------//
 
     @When("user calls {string} api with username {string} and password {string}")
     public void callLoginApiWithInvalidCredentials(String apiEndpoint, String username, String password) {
@@ -148,7 +106,7 @@ public class AuthSteps {
         try {
             response = mockMvc.perform(post(apiEndpoint)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(new ObjectMapper().writeValueAsString(request)))
+                            .content(objectMapper.writeValueAsString(request)))
                     .andReturn()
                     .getResponse();
         } catch (Exception e) {

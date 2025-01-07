@@ -30,15 +30,25 @@ public class TrainerMapper {
     }
 
     public TrainerResponse toTrainerResponse(Trainer trainer) {
-        List<TraineeResponse> traineeResponses = traineeMapper.toTraineeResponses(trainer.getTrainees());
-        return new TrainerResponse(
-                trainer.getId(),
-                trainer.getFirstName(),
-                trainer.getLastName(),
-                trainer.getSpecialization().getName(),
-                trainer.getIsActive(),
-                traineeResponses
-        );
+        if (trainer.getTrainees() != null && !trainer.getTrainees().isEmpty()) {
+            List<TraineeResponse> traineeResponses = traineeMapper.toTraineeResponses(trainer.getTrainees());
+            return new TrainerResponse(
+                    trainer.getId(),
+                    trainer.getFirstName(),
+                    trainer.getLastName(),
+                    trainer.getSpecialization().getName(),
+                    trainer.getIsActive(),
+                    traineeResponses
+            );
+        } else {
+            return new TrainerResponse(
+                    trainer.getId(),
+                    trainer.getFirstName(),
+                    trainer.getLastName(),
+                    trainer.getSpecialization().getName(),
+                    trainer.getIsActive(),
+                    null);
+        }
     }
 
     public List<TrainerResponse> toTrainerResponses(List<Trainer> trainers) {
