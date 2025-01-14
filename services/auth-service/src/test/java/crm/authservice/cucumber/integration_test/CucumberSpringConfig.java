@@ -1,4 +1,4 @@
-package crm.authservice;
+package crm.authservice.cucumber.integration_test;
 
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

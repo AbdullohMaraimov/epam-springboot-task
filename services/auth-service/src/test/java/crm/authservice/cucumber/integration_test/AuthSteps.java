@@ -1,4 +1,4 @@
-package crm.authservice;
+package crm.authservice.cucumber.integration_test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

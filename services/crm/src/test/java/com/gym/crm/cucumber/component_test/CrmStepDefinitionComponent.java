@@ -1,4 +1,4 @@
-package com.gym.crm.cucumber;
+package com.gym.crm.cucumber.component_test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Slf4j
 @RequiredArgsConstructor
-public class CrmStepDefinition {
+public class CrmStepDefinitionComponent {
 
     private final TraineeService traineeService;
     private final MockMvc mockMvc;
@@ -63,11 +63,11 @@ public class CrmStepDefinition {
     @When("do update request to {string} to change first name to {string}")
     public void sendUpdateRequest(String endPoint, String username) {
         TraineeRequest updateRequest = new TraineeRequest(
-                    "Jim",
-                    "Vali",
-                    LocalDate.of(2000, 1, 1),
-                    "USA",
-                    true);
+                "Jim",
+                "Vali",
+                LocalDate.of(2000, 1, 1),
+                "USA",
+                true);
 
         try {
             response = mockMvc.perform(patch(endPoint)

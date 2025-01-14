@@ -1,4 +1,4 @@
-package com.gym.crm.cucumber;
+package com.gym.crm.cucumber.integration_test;
 
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

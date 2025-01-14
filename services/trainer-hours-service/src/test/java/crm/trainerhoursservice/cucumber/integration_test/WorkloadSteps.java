@@ -1,12 +1,10 @@
-package crm.trainerhoursservice.cucumber;
+package crm.trainerhoursservice.cucumber.integration_test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import crm.trainerhoursservice.model.constant.ActionType;
 import crm.trainerhoursservice.model.dto.TrainerWorkload;
-import crm.trainerhoursservice.model.entity.dev.TrainingHour;
 import crm.trainerhoursservice.model.entity.prod.WorkloadSummary;
-import crm.trainerhoursservice.repository.WorkloadRepository;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
