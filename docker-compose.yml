@@ -38,6 +38,7 @@ services:
       - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
       - ACTIVE_MQ=tcp://activemq:61616
       - HOSTNAME=auth-service
+      - PROFILE=prod
     ports:
       - "8080:8080"
     depends_on:
@@ -88,6 +89,7 @@ services:
       - EUREKA_DEFAULT_ZONE=http://discovery-service:8761/eureka/
       - ACTIVE_MQ=tcp://activemq:61616
       - HOSTNAME=crm-service
+      - ACTIVE_PROFILE=prod
     depends_on:
       - auth-service
       - workload-service

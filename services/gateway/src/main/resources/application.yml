@@ -24,6 +24,12 @@ spring:
           uri: lb://CRM
           predicates:
             - Path=/api/v1/trainee/**
+          filters:
+            - AuthenticationFilter
+
+        - id: crm-trainer
+          uri: lb://CRM
+          predicates:
             - Path=/api/v1/trainer/**
           filters:
             - AuthenticationFilter

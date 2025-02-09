@@ -19,6 +19,7 @@ import com.gym.crm.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -81,6 +82,7 @@ public class TrainerServiceImpl implements TrainerService {
         return trainerResponse;
     }
 
+    @Transactional
     @Override
     public TrainerResponse findByUsername(String username) {
         log.debug("Finding trainer with username: {}", username);
@@ -142,7 +144,6 @@ public class TrainerServiceImpl implements TrainerService {
 
         if (trainer.getIsActive()) {
             log.warn("Trainer {} is already active", username);
-            throw new IllegalArgumentException("Trainer is already active");
         }
         trainer.setIsActive(true);
         trainerRepository.save(trainer);

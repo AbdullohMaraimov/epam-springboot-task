@@ -13,6 +13,7 @@ import com.gym.crm.repository.TraineeRepository;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingRepository;
 import com.gym.crm.service.client.AuthClient;
+import com.gym.crm.service.mq.MessageProducer;
 import com.gym.crm.util.PasswordGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +36,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class TraineeServiceImplTest {
 
     @Mock
-    private AuthClient authClient;
-    @Mock
     private TraineeMapper traineeMapper;
     @Mock
     private TraineeRepository traineeRepository;
@@ -44,6 +43,8 @@ class TraineeServiceImplTest {
     private TrainerRepository trainerRepository;
     @Mock
     private TrainingRepository trainingRepository;
+    @Mock
+    private MessageProducer messageProducer;
 
     @InjectMocks
     private TraineeServiceImpl traineeService;
@@ -58,6 +59,7 @@ class TraineeServiceImplTest {
                     "Jim", "Rohn", LocalDate.of(2000, 1, 1), "USA", true
             );
             Trainee trainee = Trainee.builder()
+                    .id(1L)
                     .firstName(traineeRequest.firstName())
                     .lastName(traineeRequest.lastName())
                     .dateOfBirth(traineeRequest.dateOfBirth())
@@ -68,12 +70,13 @@ class TraineeServiceImplTest {
 
             when(traineeMapper.toTrainee(traineeRequest)).thenReturn(trainee);
             when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(false);
-            when(authClient.register(new RegisterRequest("Jim.Rohn", "pswd"))).thenReturn(null);
+            when(traineeRepository.save(trainee)).thenReturn(trainee);
 
             RegistrationResponse registrationResponse = traineeService.create(traineeRequest);
 
             assertEquals(trainee.getUsername(), registrationResponse.username());
 
+            verify(messageProducer, times(1)).sendMessage(new RegisterRequest(trainee.getUsername(), trainee.getPassword()));
             verify(traineeMapper, times(1)).toTrainee(traineeRequest);
             verify(traineeRepository, times(1)).existsTraineeByUsername(any());
             verify(traineeRepository, times(1)).save(trainee);
@@ -96,11 +99,12 @@ class TraineeServiceImplTest {
 
             when(traineeMapper.toTrainee(request)).thenReturn(trainee);
             when(traineeRepository.existsTraineeByUsername(trainee.getUsername())).thenReturn(true);
-            when(authClient.register(new RegisterRequest("Jim.Rohn1", pswd))).thenReturn(null);
+            when(traineeRepository.save(trainee)).thenReturn(trainee);
 
             RegistrationResponse response = traineeService.create(request);
             assertEquals(response.username(), trainee.getUsername());
 
+            verify(messageProducer, times(1)).sendMessage(new RegisterRequest(trainee.getUsername(), trainee.getPassword()));
             verify(traineeMapper, times(1)).toTrainee(request);
             verify(traineeRepository, times(1)).existsTraineeByUsername(anyString());
             verify(traineeRepository, times(1)).save(trainee);

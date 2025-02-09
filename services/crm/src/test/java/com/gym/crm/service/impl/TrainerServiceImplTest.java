@@ -12,6 +12,7 @@ import com.gym.crm.model.entity.TrainingType;
 import com.gym.crm.repository.TrainerRepository;
 import com.gym.crm.repository.TrainingTypeRepository;
 import com.gym.crm.service.client.AuthClient;
+import com.gym.crm.service.mq.MessageProducer;
 import com.gym.crm.util.PasswordGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.*;
 class TrainerServiceImplTest {
 
     @Mock
-    private AuthClient authClient;
+    private MessageProducer messageProducer;
 
     @Mock
     private TrainerMapper trainerMapper;
@@ -64,12 +65,13 @@ class TrainerServiceImplTest {
             when(trainerMapper.toTrainer(trainerRequest)).thenReturn(trainer);
             when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
             when(trainerRepository.existsTrainerByUsername("ali.vali")).thenReturn(true);
-            when(authClient.register(new RegisterRequest("ali.vali1", "pswd"))).thenReturn(ResponseEntity.ok(null));
+            when(trainerRepository.save(trainer)).thenReturn(trainer);
 
             trainerService.create(trainerRequest);
 
             assertEquals("ali.vali1", trainer.getUsername());
 
+            verify(messageProducer, times(1)).sendMessage(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
             verify(trainerMapper, times(1)).toTrainer(trainerRequest);
             verify(trainerRepository, times(1)).existsTrainerByUsername("ali.vali");
             verify(trainerRepository, times(1)).save(trainer);
@@ -94,11 +96,13 @@ class TrainerServiceImplTest {
             mockPasswordGenerator.when(PasswordGenerator::generatePassword).thenReturn(pswd);
             when(trainingTypeRepository.findById(1L)).thenReturn(Optional.of(trainingType));
             when(trainerRepository.existsTrainerByUsername("ali.vali")).thenReturn(false);
+            when(trainerRepository.save(trainer)).thenReturn(trainer);
 
             RegistrationResponse response = trainerService.create(trainerRequest);
 
             assertEquals(response.username(), trainer.getUsername());
 
+            verify(messageProducer, times(1)).sendMessage(new RegisterRequest(trainer.getUsername(), trainer.getPassword()));
             verify(trainerMapper, times(1)).toTrainer(trainerRequest);
             verify(trainingTypeRepository, times(1)).findById(1L);
             verify(trainerRepository, times(1)).existsTrainerByUsername("ali.vali");

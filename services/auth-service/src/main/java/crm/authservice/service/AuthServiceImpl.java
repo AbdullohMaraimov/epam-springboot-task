@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -28,9 +29,9 @@ public class AuthServiceImpl implements AuthService{
     private final LoginAttemptService loginAttemptService;
 
     @Override
-    public RegistrationResponse register(RegisterRequest registerDto) throws IOException {
+    public ResponseEntity<RegistrationResponse> register(RegisterRequest registerDto) throws IOException {
         if (userRepository.existsAuthUserByUsername(registerDto.username())) {
-            throw new BadRequestException("User exists with the username: %s".formatted(registerDto.username()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         AuthUser user = AuthUser.builder()
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService{
                 .build();
 
         userRepository.save(user);
-        return new RegistrationResponse(registerDto.username(), registerDto.password());
+        return ResponseEntity.ok(new RegistrationResponse(registerDto.username(), registerDto.password()));
     }
 
     @Override
@@ -65,4 +66,9 @@ public class AuthServiceImpl implements AuthService{
         }
     }
 
+    @Transactional
+    @Override
+    public void deleteByUsername(String username) {
+        userRepository.deleteByUsername(username);
+    }
 }

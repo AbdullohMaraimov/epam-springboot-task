@@ -72,17 +72,20 @@ public class TraineeServiceImpl implements TraineeService {
         return traineeResponse;
     }
 
+    @Transactional
     @Override
     public void delete(String username) {
         log.info("Deleting trainee with username: {}", username);
         Trainee trainee = traineeRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomNotFoundException("Trainee with username %s not found".formatted(username)));
 
-        for (Trainer trainer : trainee.getTrainers()) {
-            trainer.getTrainees().remove(trainee);
-            trainerRepository.save(trainer);
+        if (trainee.getTrainers() != null && !trainee.getTrainers().isEmpty()) {
+            for (Trainer trainer : trainee.getTrainers()) {
+                trainer.getTrainees().remove(trainee);
+                trainerRepository.save(trainer);
+            }
+            trainingRepository.deleteByTraineeUsername(username);
         }
-        trainingRepository.deleteByTraineeUsername(username);
         traineeRepository.deleteByUsername(username);
         log.info("Trainee with username {} deleted successfully", username);
     }
@@ -106,6 +109,7 @@ public class TraineeServiceImpl implements TraineeService {
         return traineeMapper.toTraineeResponses(trainees);
     }
 
+    @Transactional
     @Override
     public void deleteAll() {
         log.info("Deleting all trainees");

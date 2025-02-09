@@ -24,5 +24,7 @@ public class QueueConfig {
     public Queue authQueue() {
         return new ActiveMQQueue(authQueueName);
     }
+
 }
+
 
